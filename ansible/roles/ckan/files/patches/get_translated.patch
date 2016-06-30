@@ -1,0 +1,113 @@
+diff --git a/ckan/lib/helpers.py b/ckan/lib/helpers.py
+index 8c6d9cc..3e0b7be 100644
+--- a/ckan/lib/helpers.py
++++ b/ckan/lib/helpers.py
+@@ -1151,9 +1151,11 @@ def button_attr(enable, type='primary'):
+ 
+ def dataset_display_name(package_or_package_dict):
+     if isinstance(package_or_package_dict, dict):
+-        return package_or_package_dict.get('title', '') or \
+-            package_or_package_dict.get('name', '')
++        return get_translated(package_or_package_dict, 'title') or \
++            package_or_package_dict['name']
+     else:
++        # FIXME: we probably shouldn't use the same functions for
++        # package dicts and real package objects
+         return package_or_package_dict.title or package_or_package_dict.name
+ 
+ 
+@@ -1171,8 +1173,8 @@ def dataset_link(package_or_package_dict):
+ 
+ # TODO: (?) support resource objects as well
+ def resource_display_name(resource_dict):
+-    name = resource_dict.get('name', None)
+-    description = resource_dict.get('description', None)
++    name = get_translated(resource_dict, 'name')
++    description = get_translated(resource_dict, 'description')
+     if name:
+         return name
+     elif description:
+@@ -2105,6 +2107,16 @@ def license_options(existing_license_id=None):
+         for license_id in license_ids]
+ 
+ 
++
++def get_translated(data_dict, field):
++    language = i18n.get_lang()
++    try:
++        translated = data_dict[field+'_translated']
++        return translated[language] if type(translated) == dict else translated
++    except KeyError:
++        return data_dict.get(field, '')
++
++
+ def generate_csrf_token():
+     return csrf_token.generate()
+ 
+@@ -2173,6 +2185,7 @@ __allowed_functions__ = [
+     'debug_full_info_as_list',
+     'get_facet_title',
+     'get_param_int',
++    'get_translated',
+     'sorted_extras',
+     'follow_button',
+     'follow_count',
+diff --git a/ckan/templates/package/base.html b/ckan/templates/package/base.html
+index 20dd0b1..d45e99b 100644
+--- a/ckan/templates/package/base.html
++++ b/ckan/templates/package/base.html
+@@ -8,9 +8,9 @@
+ 
+ {% block breadcrumb_content %}
+   {% if pkg %}
+-    {% set dataset = pkg.title or pkg.name %}
++    {% set dataset = h.dataset_display_name(pkg) %}
+     {% if pkg.organization %}
+-      {% set organization = pkg.organization.title or pkg.organization.name %}
++      {% set organization = h.get_translated(pkg.organization, 'title') or h.get_translated(pkg.organization, 'name') %}
+       <li>{% link_for _('Organizations'), controller='organization', action='index' %}</li>
+       <li>{% link_for organization|truncate(30), controller='organization', action='read', id=pkg.organization.name %}</li>
+     {% else %}
+diff --git a/ckan/templates/package/confirm_delete.html b/ckan/templates/package/confirm_delete.html
+index a2068ad..9062f62 100644
+--- a/ckan/templates/package/confirm_delete.html
++++ b/ckan/templates/package/confirm_delete.html
+@@ -9,9 +9,10 @@
+   <section class="module span6 offset3">
+     <div class="module-content">
+       {% block form %}
+-        <p>{{ _('Are you sure you want to delete dataset - {name}?').format(name=c.pkg_dict.name) }}</p>
++        {% set dataset = h.dataset_display_name(c.pkg_dict) %}
++        <p>{{ _('Are you sure you want to delete dataset - {name}?').format(name=dataset) }}</p>
+         <p class="form-actions">
+-          <form id='confirm-dataset-delete-form' action="{% url_for controller='package', action='delete', id=c.pkg_dict.name %}" method="post">
++          <form id='confirm-dataset-delete-form' action="{% url_for controller='package', action='delete', id=dataset %}" method="post">
+             {{ form.hidden('csrf-token', h.generate_csrf_token()) }}
+             <button class="btn" type="submit" name="cancel" >{{ _('Cancel') }}</button>
+             <button class="btn btn-primary" type="submit" name="delete" >{{ _('Confirm Delete') }}</button>
+diff --git a/ckan/templates/snippets/package_item.html b/ckan/templates/snippets/package_item.html
+index 5b8b724..19195a7 100644
+--- a/ckan/templates/snippets/package_item.html
++++ b/ckan/templates/snippets/package_item.html
+@@ -16,7 +16,7 @@ Example:
+ {% set truncate = truncate or 180 %}
+ {% set truncate_title = truncate_title or 80 %}
+ {% set title = package.title or package.name %}
+-{% set notes = h.markdown_extract(package.notes, extract_length=truncate) %}
++{% set notes = h.markdown_extract(package.notes_translated, extract_length=truncate) %}
+ 
+ {% block package_item %}
+   <li class="{{ item_class or "dataset-item" }}">
+diff --git a/ckan/tests/controllers/test_package.py b/ckan/tests/controllers/test_package.py
+index 99c062a..b486da0 100644
+--- a/ckan/tests/controllers/test_package.py
++++ b/ckan/tests/controllers/test_package.py
+@@ -473,7 +473,7 @@ class TestPackageDelete(helpers.FunctionalTestBase):
+         )
+         assert_equal(200, response.status_int)
+         message = 'Are you sure you want to delete dataset - {name}?'
+-        response.mustcontain(message.format(name=dataset['name']))
++        response.mustcontain(message.format(name=dataset['title']))
+ 
+         form = response.forms['confirm-dataset-delete-form']
+         response = form.submit('cancel')

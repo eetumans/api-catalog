@@ -20,7 +20,7 @@
       "final": true
     },
     {
-      "field_name": "notes",
+      "field_name": "notes_translated",
       "label": "Description",
       "preset": "fluent_markdown",
       "form_placeholder": "eg. A detailed description",
@@ -122,7 +122,7 @@
       "final": true
     },
     {
-      "field_name": "description",
+      "field_name": "description_translated",
       "label": "Description",
       "preset": "fluent_markdown",
       "form_placeholder": "eg. A detailed description",
