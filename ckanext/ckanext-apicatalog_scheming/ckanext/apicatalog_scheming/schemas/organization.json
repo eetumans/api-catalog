@@ -1,0 +1,34 @@
+{
+  "scheming_version": 1,
+  "group_type": "group",
+  "about_url": "http://github.com/ckan/ckanext-scheming",
+  "fields": [
+    {
+      "field_name": "title_translated",
+      "label": "Name",
+      "validators": "ignore_missing unicode",
+      "form_snippet": "large_text.html",
+      "form_attrs": {"data-module": "slug-preview-target"},
+      "form_placeholder": "My Organization"
+    },
+    {
+      "field_name": "name",
+      "label": "URL",
+      "validators": "not_empty unicode name_validator group_name_validator",
+      "form_snippet": "slug.html",
+      "form_placeholder": "my-organization"
+    },
+    {
+      "field_name": "notes_translated",
+      "label": "Description",
+      "form_snippet": "markdown.html",
+      "form_placeholder": "A little information about my organizration..."
+    },
+    {
+      "field_name": "url",
+      "label": "Image URL",
+      "form_placeholder": "http://example.com/my-image.jpg"
+    }
+  ]
+}
+
