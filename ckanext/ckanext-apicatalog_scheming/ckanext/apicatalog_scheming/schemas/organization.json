@@ -1,6 +1,6 @@
 {
   "scheming_version": 1,
-  "group_type": "group",
+  "organization_type": "organization",
   "about_url": "http://github.com/ckan/ckanext-scheming",
   "fields": [
     {
@@ -22,12 +22,12 @@
       "field_name": "notes_translated",
       "label": "Description",
       "form_snippet": "markdown.html",
-      "form_placeholder": "A little information about my organizration..."
+      "form_placeholder": "A little information about my organization..."
     },
     {
-      "field_name": "url",
-      "label": "Image URL",
-      "form_placeholder": "http://example.com/my-image.jpg"
+      "field_name": "image_upload",
+      "label": "Image",
+      "form_snippet": "upload.html"
     }
   ]
 }
