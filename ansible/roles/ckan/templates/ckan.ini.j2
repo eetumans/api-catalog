@@ -14,10 +14,25 @@ use = egg:ckan
 full_stack = true
 cache_dir = /tmp/%(ckan.site_id)s/
 
-beaker.session.key = ckan
+#beaker.session.key = ckan
 beaker.session.secret = {{ secret.ckan_config.beaker_session_secret }}
+beaker.session.key = ckan_session
 
+beaker.session.data_serializer = json
+beaker.session.httponly = true
+beaker.session.secure = true
+beaker.session.timeout = 3600
+beaker.session.save_accessed_time = true
+beaker.session.type = ext:memcached
+beaker.session.url = 127.0.0.1:11211
+beaker.session.memcache_module = pylibmc
+beaker.session.cookie_expires = true
 app_instance_uuid = {{ secret.ckan_config.app_instance_uuid }}
+
+ckanext.security.memcached = 127.0.0.1:11211
+ckanext.security.domain = {{ public_facing_hostname }}
+ckanext.security.lock_timeout = 900
+ckanext.security.login_max_count = 10
 
 who.config_file = %(here)s/who.ini
 who.log_level = warning

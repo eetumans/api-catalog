@@ -16,3 +16,6 @@
 [submodule "ckanext/ckanext-xroad_integration"]
 	path = ckanext/ckanext-xroad_integration
 	url = https://github.com/vrk-kpa/ckanext-xroad_integration.git
+[submodule "ckanext/ckanext-security"]
+	path = ckanext/ckanext-security
+	url = https://github.com/data-govt-nz/ckanext-security.git
