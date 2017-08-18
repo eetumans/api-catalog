@@ -5,9 +5,3 @@
 
 - name: Install custom Python requirements
   pip: requirements="{{ cache_path }}/requirements.txt" virtualenv="{{ virtualenv }}" extra_args='--exists-action=w --timeout=30'
-
-- name: Install custom apt requirements
-  apt: pkg={{ item }} state=latest
-  with_items:
-    - memcached # for ckanext-security
-    - libmemcached-dev # for ckanext-security

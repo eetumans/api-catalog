@@ -8,3 +8,4 @@ timezone: UTC
 apt_source_url: http://archive.ubuntu.com
 ubuntu_codename: trusty
 
+python_egg_path: /var/www/.cache/Python-Eggs
